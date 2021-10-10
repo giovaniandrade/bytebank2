@@ -1,11 +1,15 @@
+import 'package:bytebank2/components/transaction_auth_dialog.dart';
 import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/models/transaction.dart';
 import 'package:bytebank2/screens/dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(const BytebankApp());
+  // print(Uuid().v1());
+
   // save(Transaction(200.0, Contact(0, 'Gui', 2003))).then((transaction) => print(transaction));
 
   // findAll().then((transactions) => print('new transactions $transactions'));
