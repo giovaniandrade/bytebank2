@@ -24,7 +24,7 @@ class _ContactListState extends State<ContactList> {
       ),
       body: FutureBuilder<List<Contact>>(
         initialData: [],
-        future: Future.delayed(Duration(seconds: 4))
+        future: Future.delayed(Duration(seconds: 2))
             .then((value) => _dao.findAll()),
         builder: (BuildContext context, AsyncSnapshot<List<Contact>> snapshot) {
           switch (snapshot.connectionState) {

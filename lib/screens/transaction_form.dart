@@ -9,7 +9,10 @@ import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/http/webclients/transaction_webclient.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/models/transaction.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+//import 'package:giffy_dialog/giffy_dialog.dart';
+//import 'package:toast/toast.dart';
 import 'package:uuid/uuid.dart';
 
 class TransactionForm extends StatefulWidget {
@@ -25,6 +28,15 @@ class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
   final TransactionWebClient _webClient = TransactionWebClient();
   final String transactionId = Uuid().v4();
+
+  // Gera uma chave pro estado do Scaffold:
+  // final _scaffoldKey = GlobalKey<ScaffoldState>();
+  // colocando essa key no Scaffold ele fica disponivel em toda tela:
+  // return Scaffold(key: _scaffoldKey, ...
+  // depois usa normalmente:
+  // _scaffoldKey.currentState!.showSnackBar(snackBar);
+  // Obs: isso não é necessario mais para a SnackBar
+
 
   bool _sending = false;
 
@@ -140,17 +152,56 @@ class _TransactionFormState extends State<TransactionForm> {
     setState(() {
       _sending = true;
     });
-    final Transaction transactionReceived =
-        await _webClient.save(transactionCreated, password).catchError((e) {
+    final Transaction transactionReceived = await _webClient
+        .save(
+      transactionCreated,
+      password,
+    )
+        .catchError((e) {
+
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        // Envia o erro para o Firebase Crashlyticts
+        FirebaseCrashlytics.instance.setCustomKey('exception', e.toString());
+        FirebaseCrashlytics.instance
+            .setCustomKey('http_code',e.statusCode);
+        FirebaseCrashlytics.instance
+            .setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e, null);
+      }
+
       print('ERRO: $e');
       _showFailureMessage(context,
           message: e
               .message); // nesse primeiro erro pega a mensagem que vem do HttpException
     }, test: (e) => e is HttpException).catchError((e) {
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('exception', e.toString());
+        FirebaseCrashlytics.instance
+            .setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e, null);
+      }
+
       _showFailureMessage(context,
-          message: 'API não encontrada'); // Erro específico
+          message: 'API não respondendo - Timeout'); // Erro específico Timeout
+    }, test: (e) => e is TimeoutException).catchError((e) {
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('exception', e.toString());
+        FirebaseCrashlytics.instance
+            .setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e, null);
+      }
+
+      _showFailureMessage(context,
+          message: 'API não encontrada'); // Erro específico IP incorreto
     }, test: (e) => e is SocketException).catchError((e) {
       // Essa linha testa de realmente o valor passado é uma SocketException!
+      if (FirebaseCrashlytics.instance.isCrashlyticsCollectionEnabled) {
+        FirebaseCrashlytics.instance.setCustomKey('exception', e.toString());
+        FirebaseCrashlytics.instance
+            .setCustomKey('http_body', transactionCreated.toString());
+        FirebaseCrashlytics.instance.recordError(e, null);
+      }
+
       _showFailureMessage(context);
     }, test: (e) => e is Exception).whenComplete(() {
       setState(() {
@@ -162,13 +213,46 @@ class _TransactionFormState extends State<TransactionForm> {
     _showSuccessMessage(transactionReceived, context);
   }
 
+  // Fixme migrar pra algum lugar visible no sistema todo
+  // void showToast(String msg, {int duration = 8, int gravity = 0}) {
+  //   Toast.show(msg, context, duration: duration, gravity: gravity);
+  // }
+
   void _showFailureMessage(BuildContext context,
       {String message = 'Erro desconhecido'}) {
-    showDialog(
-        context: context,
-        builder: (contextDialog) {
-          return FailureDialog(message);
-        });
+
+    // Assim usa Giffy Dialog:
+    // Não funcionou por que não suporta Null Safety
+    // https://pub.dev/packages/giffy_dialog
+    /* showDialog(
+      context: context,builder: (_) => NetworkGiffyDialog(
+        image:Image.asset('images/error.gif'),
+    title: Text('OPS',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            fontSize: 22.0,
+            fontWeight: FontWeight.w600)),
+      description:Text(message,
+        textAlign: TextAlign.center,
+      ),
+      entryAnimation: EntryAnimation.TOP,
+      onOkButtonPressed: () {},
+    ) );*/
+
+    // Assim usa Toast:
+    // Nao funcionou por que não suporta Null Safety
+    // showToast(message, gravity: Toast.BOTTOM);
+
+    // Assim usa o SnackBar:
+    final snackBar = SnackBar(content: Text(message));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    // Assim usa o Dialog:
+    // showDialog(
+    //     context: context,
+    //     builder: (contextDialog) {
+    //       return FailureDialog(message);
+    //     });
   }
 
   Future<void> _showSuccessMessage(
