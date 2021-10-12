@@ -1,16 +1,38 @@
+import 'package:bytebank2/models/name.dart';
 import 'package:bytebank2/screens/contacts_list.dart';
+import 'package:bytebank2/screens/name.dart';
 import 'package:bytebank2/screens/transactions_list.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class DashboardContainer extends StatelessWidget {
+  const DashboardContainer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => NameCubit("Giovani"),
+      child: DashboardView(),
+    );
+  }
+}
+
+class DashboardView extends StatelessWidget {
+  const DashboardView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // final name = context.read<NameCubit>().state;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dashboard'),
+        // Segundo o prof do curso isso não é legal porque mistura o observer com UI
+        // no entanto nem ele conseguiu separar
+        title: BlocBuilder<NameCubit, String>(
+          builder: (context, name) {
+            return Text('Welcome $name');
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -26,25 +48,36 @@ class Dashboard extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Image.asset('images/bytebank_logo.png'),
           ),
-          SingleChildScrollView( //ListView tambem funcionaria
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _FeatureItem(
-                  'Transfer',
-                  Icons.monetization_on,
-                  onClick: () {
-                    _showContactList(context);
-                  },
-                ),
-                _FeatureItem(
-                  'Transaction Feed',
-                  Icons.description,
-                  onClick: () {
-                    _showTransactionList(context);
-                  },
-                ),
-              ],
+          SingleChildScrollView(
+            child: Container(
+              height: 120,
+              child:
+                ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: <Widget>[
+                    _FeatureItem(
+                      'Transfer',
+                      Icons.monetization_on,
+                      onClick: () {
+                        _showContactList(context);
+                      },
+                    ),
+                    _FeatureItem(
+                      'Transaction Feed',
+                      Icons.description,
+                      onClick: () {
+                        _showTransactionList(context);
+                      },
+                    ),
+                    _FeatureItem(
+                      'Change name',
+                      Icons.person_outline,
+                      onClick: () {
+                        _showChangeName(context);
+                      },
+                    ),
+                  ],
+                )
             ),
           )
         ],
@@ -52,8 +85,19 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  void _showContactList(BuildContext context) {
+  // ATENÇÃO: aqui gera erro se não capturar o cubit do contexto antigo e repassar
+  void _showChangeName(BuildContext blocContext) {
+    Navigator.of(blocContext).push(
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: BlocProvider.of<NameCubit>(blocContext),
+          child: NameContainer(),
+        ),
+      ),
+    );
+  }
 
+  void _showContactList(BuildContext context) {
     // Apenas para testar as exceções no Firebase
     // FirebaseCrashlytics.instance.crash();
 

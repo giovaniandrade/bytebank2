@@ -36,6 +36,7 @@ dependencies:
   uuid:
   firebase_core:
   firebase_crashlytics:
+  flutter_bloc: 
 #  giffy_dialog:
 #  toast:
 

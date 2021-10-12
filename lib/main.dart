@@ -1,15 +1,14 @@
 import 'dart:async';
 
+import 'package:bytebank2/components/theme.dart';
+import 'package:bytebank2/screens/counter.dart';
+import 'package:bytebank2/screens/dashboard.dart';
+import 'package:bytebank2/screens/name.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:bytebank2/components/transaction_auth_dialog.dart';
-import 'package:bytebank2/http/webclient.dart';
-import 'package:bytebank2/models/contact.dart';
-import 'package:bytebank2/models/transaction.dart';
-import 'package:bytebank2/screens/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
 
@@ -47,24 +46,25 @@ void main() async {
   // });
 }
 
+class LogObserver extends BlocObserver {
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    print('${bloc.runtimeType} > $change');
+    super.onChange(bloc, change);
+  }
+}
+
 class BytebankApp extends StatelessWidget {
   const BytebankApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
+    Bloc.observer = LogObserver();
+
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Colors.green[900],
-        colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.green
-        ).copyWith(
-            secondary: Colors.blueAccent[700]), // cor secundaria do tema
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.blueAccent[700],
-          textTheme: ButtonTextTheme.primary,
-        ),
-      ),
-      home: Dashboard(),
+      theme: bytebankTheme,
+      home: DashboardContainer(),
     );
   }
 }
