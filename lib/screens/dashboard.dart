@@ -1,3 +1,4 @@
+import 'package:bytebank2/components/container.dart';
 import 'package:bytebank2/models/name.dart';
 import 'package:bytebank2/screens/contacts_list.dart';
 import 'package:bytebank2/screens/name.dart';
@@ -6,8 +7,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DashboardContainer extends StatelessWidget {
-  const DashboardContainer({Key? key}) : super(key: key);
+class DashboardContainer extends BlocContainer {
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +101,14 @@ class DashboardView extends StatelessWidget {
     // Apenas para testar as exceções no Firebase
     // FirebaseCrashlytics.instance.crash();
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ContactList(),
-      ),
-    );
+    // Antes de bloc era assim
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => ContactList(),
+    //   ),
+    // );
+
+    push(context, ContactsListContainer());
   }
 
   void _showTransactionList(BuildContext context) {
