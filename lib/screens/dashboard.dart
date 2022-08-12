@@ -1,29 +1,37 @@
 import 'package:bytebank2/components/container.dart';
+import 'package:bytebank2/components/localization.dart';
 import 'package:bytebank2/models/name.dart';
 import 'package:bytebank2/screens/contacts_list.dart';
 import 'package:bytebank2/screens/name.dart';
 import 'package:bytebank2/screens/transactions_list.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DashboardContainer extends BlocContainer {
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => NameCubit("Giovani"),
-      child: DashboardView(),
+      // child: DashboardView(),
+      child: I18NLoadingContainer(
+        viewKey: "dashboard",
+        // Aqui recebe as mensagens e constroi o Dashboard
+        creator: (messages) => DashboardView(DashboardViewLazyI18N(messages)),
+      ),
     );
   }
 }
 
 class DashboardView extends StatelessWidget {
-  const DashboardView({Key? key}) : super(key: key);
+  final DashboardViewLazyI18N _i18n;
+
+  const DashboardView(this._i18n, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // final name = context.read<NameCubit>().state;
+
+    // final i18n = DashboardViewLazyI18N(_messages);
     return Scaffold(
       appBar: AppBar(
         // Segundo o prof do curso isso não é legal porque mistura o observer com UI
@@ -50,35 +58,33 @@ class DashboardView extends StatelessWidget {
           ),
           SingleChildScrollView(
             child: Container(
-              height: 120,
-              child:
-                ListView(
+                height: 120,
+                child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: <Widget>[
                     _FeatureItem(
-                      'Transfer',
+                      _i18n.transfer,
                       Icons.monetization_on,
                       onClick: () {
                         _showContactList(context);
                       },
                     ),
                     _FeatureItem(
-                      'Transaction Feed',
+                      _i18n.transactionFeed,
                       Icons.description,
                       onClick: () {
                         _showTransactionList(context);
                       },
                     ),
                     _FeatureItem(
-                      'Change name',
+                      _i18n.changeName,
                       Icons.person_outline,
                       onClick: () {
                         _showChangeName(context);
                       },
                     ),
                   ],
-                )
-            ),
+                )),
           )
         ],
       ),
@@ -119,6 +125,27 @@ class DashboardView extends StatelessWidget {
     );
   }
 }
+
+class DashboardViewLazyI18N {
+  // Por padrao _ é para constantes
+  final I18NMessages _messages;
+
+  DashboardViewLazyI18N(this._messages);
+
+  // Usando o get, fica como se fosse um atributo
+  String get transfer => _messages.get("transfer") ?? '';
+  String get transactionFeed => _messages.get("transaction_feed") ?? '';
+  String get changeName => _messages.get("change_name") ?? '';
+}
+
+// class DashboardViewI18N extends ViewI18N {
+//   DashboardViewI18N(BuildContext context) : super(context);
+//
+//   // Usando o get, fica como se fosse um atributo
+//   String get transfer => localize({"pt-br": "Transferir", "en": "Transfer"}) ?? '';
+//   String get transactionFeed => localize({"pt-br": "Transações", "en": "Transaction Feed"}) ?? '';
+//   String get changeName => localize({"pt-br": "Alterar nome", "en": "Change name"}) ?? '';
+// }
 
 class _FeatureItem extends StatelessWidget {
   final String name;

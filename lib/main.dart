@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:bytebank2/components/localization.dart';
 import 'package:bytebank2/components/theme.dart';
-import 'package:bytebank2/screens/counter.dart';
 import 'package:bytebank2/screens/dashboard.dart';
-import 'package:bytebank2/screens/name.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
@@ -11,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {
-
   // Primeiro avisa o Flutter que vamos executar um método assíncrono antes do runApp
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -59,14 +57,13 @@ class BytebankApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Bloc.observer = LogObserver();
 
     return MaterialApp(
       theme: bytebankTheme,
-      home: DashboardContainer(),
+      home: LocalizationContainer(
+        child: DashboardContainer(),
+      ),
     );
   }
 }
-
-
