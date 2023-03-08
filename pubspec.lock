@@ -29,6 +29,16 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
+<<<<<<< HEAD
+=======
+  charcode:
+    dependency: transitive
+    description:
+      name: charcode
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
+>>>>>>> c987415 (Dia que entreguei Note antigo Convcard)
   clock:
     dependency: transitive
     description:
@@ -64,6 +74,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+<<<<<<< HEAD
   ffi:
     dependency: transitive
     description:
@@ -78,6 +89,8 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.4"
+=======
+>>>>>>> c987415 (Dia que entreguei Note antigo Convcard)
   firebase_core:
     dependency: "direct main"
     description:
@@ -219,7 +232,11 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
+<<<<<<< HEAD
   path_provider:
+=======
+  pedantic:
+>>>>>>> c987415 (Dia que entreguei Note antigo Convcard)
     dependency: transitive
     description:
       name: path_provider
@@ -385,6 +402,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+<<<<<<< HEAD
   win32:
     dependency: transitive
     description:
@@ -402,3 +420,8 @@ packages:
 sdks:
   dart: ">=2.17.6 <3.0.0"
   flutter: ">=3.0.0"
+=======
+sdks:
+  dart: ">=2.17.0-0 <3.0.0"
+  flutter: ">=1.16.0"
+>>>>>>> c987415 (Dia que entreguei Note antigo Convcard)

@@ -101,8 +101,12 @@ class I18NLoadingContainer extends BlocContainer {
   Widget build(BuildContext context) {
     return BlocProvider<I18NMessagesCubit>(
       create: (BuildContext context) {
-        final cubit = I18NMessagesCubit(this.viewKey);
-        cubit.reload(I18NWebClient(this.viewKey));
+
+// NAO TENHO CERTEZA DESSES MERGES
+//        final cubit = I18NMessagesCubit(this.viewKey);
+//        cubit.reload(I18NWebClient(this.viewKey));
+        final cubit = I18NMessagesCubit();
+        cubit.reload(I18NWebClient(this.viewKey!));
         return cubit;
       },
       child: I18NLoadingView(this.creator),
